@@ -19,10 +19,16 @@
             "LaravelEloquentSpatial\\": "src/"
         }
     },
+    "autoload-dev": {
+        "psr-4": {
+            "LaravelEloquentSpatial\\Tests\\": "tests/"
+        }
+    },
     "license": "UNLICENSE",
     "extra": {
         "laravel": {
             "providers": [
+                "LaravelEloquentSpatial\\EloquentSpatialProvider"
             ]
         }
     }
