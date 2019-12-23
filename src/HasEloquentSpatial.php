@@ -38,6 +38,10 @@ trait HasEloquentSpatial
             /** @var Model|HasEloquentSpatial $model */
             foreach (array_keys($model->spatialAttributes) as $attribute) {
 
+                if (!$model->attributes[$attribute]) {
+                    continue;
+                }
+
                 $model->eloquentSpatialInstances[$attribute]->setStateFromType(
                     (new EwkbFormat)->convertBinaryToObject($model->attributes[$attribute])
                 );
