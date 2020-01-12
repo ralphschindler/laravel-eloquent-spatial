@@ -2,13 +2,11 @@
 
 namespace LaravelEloquentSpatial\Types;
 
-use LaravelEloquentSpatial\Types\TypeInterface;
-
 /**
  * @property float $latitude
  * @property float $longitude
  */
-class Point implements TypeInterface
+class Point extends AbstractType
 {
     public $x;
     public $y;
@@ -20,7 +18,7 @@ class Point implements TypeInterface
         $this->srid = config('eloquent-spatial.geojson_assumed_srid');
     }
 
-    public function setStateFromType(TypeInterface $point)
+    public function setStateFromType(AbstractType $point)
     {
         if (!$point instanceof Point) {
             throw new \RuntimeException('State for ' . __CLASS__ . ' can only be set from an instance of ' . __CLASS__);

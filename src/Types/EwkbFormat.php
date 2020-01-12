@@ -7,7 +7,7 @@ namespace LaravelEloquentSpatial\Types;
  */
 class EwkbFormat
 {
-    public function convertBinaryToObject($mysqlBinary)
+    public function convertBinaryToObject($mysqlBinary, AbstractType $type = null)
     {
         $stream = fopen('php://memory', 'r+');
 
@@ -50,7 +50,7 @@ class EwkbFormat
                 throw new \RuntimeException(get_class($object) . ' is currently not a supported type in this library');
         }
 
-        fwrite($stream, pack('ici', $object->srid, 1, 1));
+        fwrite($stream, pack('ici', $object->srid, 1, $type)); // 1 is little endian
         fwrite($stream, $binary);
 
         rewind($stream);
@@ -96,7 +96,18 @@ class EwkbFormat
 
     protected function toPolygonBinary(Polygon $polygon)
     {
+        $binary = pack('i', count($polygon->rings));
 
+        foreach ($polygon->rings as $ring) {
+
+            $binary .= pack('i', count($ring));
+
+            foreach ($ring as $point) {
+                $binary .= $this->toPointBinary($point);
+            }
+        }
+
+        return $binary;
     }
 
     /**

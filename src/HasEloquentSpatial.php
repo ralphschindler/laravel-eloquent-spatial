@@ -4,7 +4,7 @@ namespace LaravelEloquentSpatial;
 
 use Illuminate\Database\Eloquent\Model;
 use LaravelEloquentSpatial\Types\EwkbFormat;
-use LaravelEloquentSpatial\Types\TypeInterface;
+use LaravelEloquentSpatial\Types\AbstractType;
 use ReflectionClass;
 use RuntimeException;
 
@@ -13,7 +13,7 @@ use RuntimeException;
  */
 trait HasEloquentSpatial
 {
-    /** @var TypeInterface[]  */
+    /** @var AbstractType[]  */
     protected $eloquentSpatialInstances = [];
 
     public static function bootHasEloquentSpatial()
@@ -38,7 +38,7 @@ trait HasEloquentSpatial
             /** @var Model|HasEloquentSpatial $model */
             foreach (array_keys($model->spatialAttributes) as $attribute) {
 
-                if (!$model->attributes[$attribute]) {
+                if (!isset($model->attributes[$attribute])) {
                     continue;
                 }
 
@@ -54,9 +54,7 @@ trait HasEloquentSpatial
             /** @var Model|HasEloquentSpatial $model */
             foreach ($model->spatialAttributes as $attribute => $type) {
                 $model->attributes[$attribute] = $model->getConnection()->raw(
-                    "X'"
-                    . bin2hex((new EwkbFormat)->convertObjectToBinary($model->attributes[$attribute]))
-                    . "'"
+                    "X'" . $model->attributes[$attribute]->exportStateToEwkbHexidecimal() . "'"
                 );
             }
         });
@@ -74,7 +72,7 @@ trait HasEloquentSpatial
         foreach ($this->spatialAttributes as $attribute => $type) {
             $instance = new $type;
 
-            if (!$instance instanceof TypeInterface) {
+            if (!$instance instanceof AbstractType) {
                 throw new RuntimeException(__CLASS__ . '::$spatialAttributes must be EloquentSpatialTypeInterface based classes');
             }
 

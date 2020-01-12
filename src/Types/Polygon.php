@@ -6,7 +6,7 @@ namespace LaravelEloquentSpatial\Types;
  * @property Point[] $exteriorRing
  * @property Point[] $firstInteriorRing
  */
-class Polygon implements TypeInterface
+class Polygon extends AbstractType
 {
     public $rings = [];
     public $srid;
@@ -44,7 +44,7 @@ class Polygon implements TypeInterface
         ];
     }
 
-    public function setStateFromType(TypeInterface $type)
+    public function setStateFromType(AbstractType $type)
     {
         if (!$type instanceof Polygon) {
             throw new \RuntimeException('Can only set state from a ' . __CLASS__ . ' object');
