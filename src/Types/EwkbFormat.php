@@ -7,7 +7,7 @@ namespace LaravelEloquentSpatial\Types;
  */
 class EwkbFormat
 {
-    public function convertBinaryToObject($mysqlBinary, AbstractType $type = null)
+    public function convertBinaryToObject($mysqlBinary)
     {
         $stream = fopen('php://memory', 'r+');
 
