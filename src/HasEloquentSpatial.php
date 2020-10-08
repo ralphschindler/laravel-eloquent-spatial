@@ -53,6 +53,10 @@ trait HasEloquentSpatial
         static::saving(function (Model $model) {
             /** @var Model|HasEloquentSpatial $model */
             foreach ($model->spatialAttributes as $attribute => $type) {
+                if ($model->attributes[$attribute] === null) {
+                    continue;
+                }
+
                 $model->attributes[$attribute] = $model->getConnection()->raw(
                     "X'" . $model->attributes[$attribute]->exportStateToEwkbHexidecimal() . "'"
                 );
