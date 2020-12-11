@@ -53,4 +53,9 @@ class Polygon extends AbstractType
         $this->rings = $type->rings;
         $this->srid = $type->srid;
     }
+
+    public function isNull()
+    {
+        return empty($this->rings);
+    }
 }

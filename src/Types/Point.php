@@ -44,6 +44,19 @@ class Point extends AbstractType
         $this->y = $geoJson['coordinates'][1];
     }
 
+    public function setStateFromArray(array $point)
+    {
+        if (isset($point['latitude'], $point['longitude'])) {
+            $this->latitude = $point['latitude'];
+            $this->longitude = $point['longitude'];
+        }
+
+        if (isset($point['x'], $point['y'])) {
+            $this->x = $point['x'];
+            $this->y = $point['y'];
+        }
+    }
+
     public function exportStateToGeoJson(): array
     {
         return [
@@ -52,11 +65,13 @@ class Point extends AbstractType
         ];
     }
 
+    public function isNull()
+    {
+        return $this->x === null || $this->y === null;
+    }
+
     public function __get($property)
     {
-        // SRID's that define lat first, as the x coordinate
-        // $latFirst = in_array($this->srid, [4326]);
-
         switch ($property) {
             case 'longitude':
                 return $this->x;
@@ -79,6 +94,14 @@ class Point extends AbstractType
             default:
                 throw new \OutOfRangeException($property . ' is not a valid property of ' . __CLASS__);
         }
+    }
+
+    public function toLatitudeLongitudeArray()
+    {
+        return [
+            'latitude'  => $this->latitude,
+            'longitude' => $this->longitude
+        ];
     }
 }
 

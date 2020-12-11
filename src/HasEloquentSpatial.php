@@ -36,24 +36,35 @@ trait HasEloquentSpatial
 
         static::retrieved(function (Model $model) {
             /** @var Model|HasEloquentSpatial $model */
-            foreach (array_keys($model->spatialAttributes) as $attribute) {
+            foreach ($model->spatialAttributes as $attribute => $type) {
 
-                if (!isset($model->attributes[$attribute])) {
-                    continue;
+                if (isset($model->attributes[$attribute])) {
+                    $model->eloquentSpatialInstances[$attribute]->setStateFromType(
+                        (new EwkbFormat)->convertBinaryToObject($model->attributes[$attribute])
+                    );
+                } else {
+                    $model->eloquentSpatialInstances[$attribute] = new $type;
                 }
 
-                $model->eloquentSpatialInstances[$attribute]->setStateFromType(
-                    (new EwkbFormat)->convertBinaryToObject($model->attributes[$attribute])
-                );
-
                 $model->attributes[$attribute] = $model->eloquentSpatialInstances[$attribute];
+                $model->original[$attribute] = $model->attributes[$attribute];
             }
         });
 
         static::saving(function (Model $model) {
             /** @var Model|HasEloquentSpatial $model */
             foreach ($model->spatialAttributes as $attribute => $type) {
-                if ($model->attributes[$attribute] === null) {
+                if (is_array($model->attributes[$attribute])) {
+                    if (isset($model->attributes[$attribute]['latitude'], $model->attributes[$attribute]['longitude'])) {
+                        $model->eloquentSpatialInstances[$attribute]->setStateFromArray($model->attributes[$attribute]);
+                        $model->attributes[$attribute] = $model->eloquentSpatialInstances[$attribute];
+                    } else {
+                        throw new RuntimeException("$attribute was set/reset to an array but does not contain a latitude or longitude");
+                    }
+                }
+
+                if ($model->attributes[$attribute] === null || $model->attributes[$attribute]->isNull()) {
+                    $model->attributes[$attribute] = null;
                     continue;
                 }
 

@@ -19,4 +19,6 @@ abstract class AbstractType
     {
         return bin2hex((new EwkbFormat)->convertObjectToBinary($this));
     }
+
+    abstract public function isNull();
 }
